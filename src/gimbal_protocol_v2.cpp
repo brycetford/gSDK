@@ -31,7 +31,7 @@
 //   Includes
 // ------------------------------------------------------------------------------
 
-#include "gimbal_protocol_v2.h"
+#include "gSDK/gimbal_protocol_v2.h"
 
 Gimbal_Protocol_V2::Gimbal_Protocol_V2(Serial_Port *serial_port,
                                        const mavlink_system_t &system) :

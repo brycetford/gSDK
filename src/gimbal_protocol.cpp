@@ -33,7 +33,7 @@
 
 #include <errno.h>
 
-#include "gimbal_protocol.h"
+#include "gSDK/gimbal_protocol.h"
 
 Gimbal_Protocol::Gimbal_Protocol(Serial_Port *serial_port,
                                  const mavlink_system_t &system) :

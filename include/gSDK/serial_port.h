@@ -63,7 +63,7 @@
 #include <signal.h>
 
 // #include <common/mavlink.h>
-#include <ardupilotmega/mavlink.h>
+#include <mavlink/include/mavlink/v2.0/ardupilotmega/mavlink.h>
 
 // ------------------------------------------------------------------------------
 //   Defines

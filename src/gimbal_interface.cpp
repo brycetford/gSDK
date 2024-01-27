@@ -33,10 +33,10 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "gimbal_protocol_v1.h"
-#include "gimbal_protocol_v2.h"
+#include "gSDK/gimbal_protocol_v1.h"
+#include "gSDK/gimbal_protocol_v2.h"
 
-#include "gimbal_interface.h"
+#include "gSDK/gimbal_interface.h"
 
 // Gimbal status 1
 enum status1_t {

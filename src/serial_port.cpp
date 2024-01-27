@@ -52,7 +52,7 @@
 // ------------------------------------------------------------------------------
 
 #include <sys/ioctl.h> //ioctl() call defenitions
-#include "serial_port.h"
+#include "gSDK/serial_port.h"
 
 // ----------------------------------------------------------------------------------
 //   Serial Port Manager Class

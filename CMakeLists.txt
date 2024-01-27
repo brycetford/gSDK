@@ -1,81 +1,51 @@
 cmake_minimum_required(VERSION 3.10)
-project(gSDK VERSION 3.0.0)
+project(gSDK)
 
-find_package( Threads )
+find_package(ament_cmake REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+find_package(Threads REQUIRED)
 
-set(MAVLINK_INCLUDES
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/mavlink/include/mavlink/v2.0")
+#################
+# Setup targets #
+#################
 
-set(MAVLINK_SRC
-    "${CMAKE_CURRENT_SOURCE_DIR}/src")
+include_directories(include)
 
-###############################################################################
-#### INCLUDES #################################################################
-###############################################################################
+add_library(gSDK SHARED
+  src/gimbal_interface.cpp
+  src/gimbal_protocol_v1.cpp
+  src/gimbal_protocol_v2.cpp
+  src/gimbal_protocol.cpp
+  src/serial_port.cpp)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-                    ${CMAKE_CURRENT_SOURCE_DIR}/src
-                    ${MAVLINK_INCLUDES}
-                    )
+ament_target_dependencies(gSDK Threads)
 
-###############################################################################
-#### DEPENDENCIES #############################################################
-###############################################################################
-
-###############################################################################
-#### GENERATE OUTPUT ##########################################################
-###############################################################################
-
-set(GSDK_APP_SRC
-    mavlink_control.cpp
-    ${MAVLINK_SRC}/gimbal_interface.cpp
-    ${MAVLINK_SRC}/gimbal_protocol.cpp
-    ${MAVLINK_SRC}/gimbal_protocol_v1.cpp
-    ${MAVLINK_SRC}/gimbal_protocol_v2.cpp
-    ${MAVLINK_SRC}/serial_port.cpp
+target_include_directories(gSDK PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
+	$<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
 
-set(GSDK_HEADERS
-    mavlink_control.h
-    ${MAVLINK_SRC}/gimbal_interface.h
-    ${MAVLINK_SRC}/gimbal_protocol.h
-    ${MAVLINK_SRC}/gimbal_protocol_v1.h
-    ${MAVLINK_SRC}/gimbal_protocol_v2.h
-    ${MAVLINK_SRC}/serial_port.h
+############
+# Install ##
+############
+
+# Export information to downstream packages
+ament_export_dependencies(ament_cmake Threads)
+
+ament_export_targets(export_gSDK HAS_LIBRARY_TARGET)
+
+ament_export_include_directories(include)
+ament_export_libraries(gSDK)
+
+# Install header files
+install(DIRECTORY include/${PROJECT_NAME}/ DESTINATION include/${PROJECT_NAME})
+
+install(TARGETS gSDK
+	EXPORT export_gSDK
+	ARCHIVE DESTINATION lib
+	LIBRARY DESTINATION lib
+	RUNTIME DESTINATION bin
+	INCLUDES DESTINATION include
 )
 
-add_library(${PROJECT_NAME} SHARED ${GSDK_APP_SRC})
-
-target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} )
-
-# CMake files
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file("gsdk-config-version.cmake" VERSION ${PROJECT_VERSION} COMPATIBILITY SameMajorVersion)
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/gsdk-config.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/cmake/gsdk-config.cmake
-  @ONLY)
-
-install(TARGETS ${PROJECT_NAME} EXPORT gSDK-targets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        INCLUDES DESTINATIONS include/mavlink
-        )
-
-install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/cmake/gsdk-config.cmake
-        ${PROJECT_BINARY_DIR}/gsdk-config-version.cmake
-        DESTINATION lib/cmake/${PROJECT_NAME})
-
-install(EXPORT gSDK-targets
-        NAMESPACE gSDK::
-        DESTINATION lib/cmake/${PROJECT_NAME}
-)
-install(FILES ${GSDK_HEADERS}
-        DESTINATION include/${PROJECT_NAME})
-
-install(DIRECTORY "${MAVLINK_INCLUDES}/"
-        DESTINATION include/mavlink
-        FILES_MATCHING PATTERN "*.h")
-
-# add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/examples")
+ament_package()
