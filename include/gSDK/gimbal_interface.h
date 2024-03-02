@@ -340,6 +340,13 @@ public:
     attitude<float> get_gimbal_attitude(void);
 
     /**
+     * @brief  This function get gimbal attitude as a quaternion
+     * @param: None
+     * @ret: Gimbal attitude
+     */
+    quaternion<float> get_gimbal_attitude_q(void);
+
+    /**
      * @brief  This function get gimbal encoder depends on encoder type send
      * @param: None
      * @ret: Gimbal encoder

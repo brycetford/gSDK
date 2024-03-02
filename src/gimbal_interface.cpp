@@ -1089,6 +1089,55 @@ attitude<float> Gimbal_Interface::get_gimbal_attitude(void)
 }
 
 /**
+ * @brief  This function get gimbal attitude as a quaternion
+ * @param: None
+ * @ret: Gimbal attitude
+ */
+quaternion<float> Gimbal_Interface::get_gimbal_attitude_q(void)
+{
+    uint64_t timestamps = 0;
+
+    if (_proto == MAVLINK_GIMBAL_V1) {
+        pthread_mutex_lock(&_messages.mutex);
+        timestamps = _messages.timestamps.mount_orientation;
+        pthread_mutex_unlock(&_messages.mutex);
+
+        /* Check gimbal status has changed*/
+        if (timestamps) {
+            pthread_mutex_lock(&_messages.mutex);
+            /* Reset timestamps */
+            _messages.timestamps.mount_orientation = 0;
+            const mavlink_mount_orientation_t &orient = _messages.mount_orientation;
+            pthread_mutex_unlock(&_messages.mutex);
+
+            if(get_gimbal_mode() == Gimbal_Protocol::control_mode_t::GIMBAL_LOCK_MODE)
+            {
+                return quaternion<float>(orient.roll, orient.pitch, orient.yaw_absolute);
+            }
+
+            return quaternion<float>(orient.roll, orient.pitch, orient.yaw);
+        }
+
+    } else {
+        pthread_mutex_lock(&_messages.mutex);
+        timestamps = _messages.timestamps.attitude_status;
+        pthread_mutex_unlock(&_messages.mutex);
+
+        /* Check gimbal status has changed*/
+        if (_messages.timestamps.attitude_status) {
+            pthread_mutex_lock(&_messages.mutex);
+            /* Reset timestamps */
+            _messages.timestamps.attitude_status = 0;
+            const mavlink_gimbal_device_attitude_status_t &status = _messages.atttitude_status;
+            quaternion<float> attitude(status.q[0], status.q[1], status.q[2], status.q[3]);
+            
+            pthread_mutex_unlock(&_messages.mutex);
+            return attitude;
+        }
+    }
+}
+
+/**
  * @brief  This function get gimbal encoder depends on encoder type send
  * @param: None
  * @ret: Gimbal encoder

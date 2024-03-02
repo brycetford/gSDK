@@ -74,6 +74,32 @@ struct attitude {
 };
 
 template<typename T>
+struct quaternion 
+{
+    T w = 0;
+    T x = 0;
+    T y = 0;
+    T z = 0;
+
+    quaternion() = default;
+    quaternion(T _w, T _x, T _y, T _z) : w(_w), x(_x), y(_y), z(_z) {};
+    quaternion(T roll, T pitch, T yaw)
+    {
+        float cr = cos(roll * 0.5);
+        float sr = sin(roll * 0.5);
+        float cp = cos(pitch * 0.5);
+        float sp = sin(pitch * 0.5);
+        float cy = cos(yaw * 0.5);
+        float sy = sin(yaw * 0.5);
+
+        w = cr * cp * cy + sr * sp * sy;
+        x = sr * cp * cy - cr * sp * sy;
+        y = cr * sp * cy + sr * cp * sy;
+        z = cr * cp * sy - sr * sp * cy;
+    }
+};
+
+template<typename T>
 struct vector3 {
     T x = 0;
     T y = 0;
